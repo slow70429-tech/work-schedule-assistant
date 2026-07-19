@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>個人工作行程助手</title>
+  <title>個人工作行程助手 V1.3</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root{--ink:#171717;--line:#333;--soft:#f3f3f3;--muted:#666;--paper:#fff}
@@ -28,7 +28,7 @@
     .empty{color:#888;text-align:center;margin:auto;font-size:13px}
     .job{border:1.2px solid #555;padding:4px 5px;break-inside:avoid;background:#fff}
     .job-title{font-size:12.5px;font-weight:900;line-height:1.25;word-break:break-word}.job-title .code{font-family:Arial,sans-serif;margin-right:3px}
-    .loc{font-size:11px;margin-top:1px;word-break:break-word}.people{font-size:11px;margin-top:1px;font-weight:700}.tasks{margin:3px 0 0;padding:3px 0 0;border-top:1px solid #aaa;font-size:11px;line-height:1.25}
+    .loc{font-size:11px;margin-top:1px;word-break:break-word}.people{font-size:11px;margin-top:2px;font-weight:900;border-top:1px dotted #999;padding-top:2px}.tasks{margin:3px 0 0;padding:3px 0 0;border-top:1px solid #aaa;font-size:11px;line-height:1.25}
     .task{margin:0}.note{margin-top:3px;font-size:10.5px;line-height:1.2;font-weight:700}.vehicle{margin-top:3px;font-size:10.5px;border-top:1px dotted #777;padding-top:2px}
     .footer-note{text-align:right;margin-top:7px;font-size:10px;color:#555}
     @media(max-width:900px){.controls{grid-template-columns:1fr 1fr}.filebox{grid-column:1/-1}.week-page{overflow-x:auto}.week-grid{min-width:1050px}.day{min-height:560px}.app{padding:10px}}
@@ -46,7 +46,7 @@
 <body>
 <div class="app">
   <section class="toolbar">
-    <h1>個人工作行程助手</h1>
+    <h1>個人工作行程助手 <small style="font-size:13px">V1.3</small></h1>
     <div class="sub">匯入公司的 Excel，自動篩選人員欄包含指定代號的工作，按星期一至星期日橫向列印。</div>
     <div class="controls">
       <div class="filebox"><label>公司行程 Excel</label><input id="file" type="file" accept=".xlsx,.xls" /></div>
@@ -141,7 +141,7 @@
     const title=[j.code,j.name].filter(Boolean).map(esc).join(' ');
     const loc=j.location?`<div class="loc">地點／項目：${esc(j.location)}</div>`:'';
     const tasks=j.tasks.map(t=>`<div class="task">□ ${esc(t.name)}${t.qty?` (${esc(t.qty)})`:''}</div>`).join('');
-    const people=j.person?`<div class="people">人員：${esc(j.person)}</div>`:'';
+    const people=`<div class="people">人員：${esc(j.person || '未填')}</div>`;
     const notes=j.notes.length?`<div class="note">★ ${esc(j.notes.join('；'))}</div>`:'';
     const vehicle=j.vehicle?`<div class="vehicle">車輛：${esc(j.vehicle)}</div>`:'';
     return `<section class="job"><div class="job-title"><span class="code">${title||'未命名工作'}</span></div>${loc}${people}<div class="tasks">${tasks||'□ 工作'}</div>${notes}${vehicle}</section>`;
@@ -158,10 +158,10 @@
           const gs=groupedForDay(byDate.get(dayKey(d))||[]); const body=gs.length?gs.map(renderJob).join(''):`<div class="empty">${inRange?'無行程':'—'}</div>`;
           cells+=`<article class="day ${i>=5?'weekend':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）</header><div class="day-body">${body}</div></article>`;
         }
-        pages+=`<section class="week-page"><div class="week-title">${esc(token)}　個人工作行程</div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div><div class="week-grid">${cells}</div><div class="footer-note">由個人工作行程助手整理｜人員欄包含「${esc(token)}」</div></section>`;
+        pages+=`<section class="week-page"><div class="week-title">${esc(token)}　個人工作行程</div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div><div class="week-grid">${cells}</div><div class="footer-note">由個人工作行程助手 V1.3 整理｜人員欄包含「${esc(token)}」</div></section>`;
       }
       $('output').innerHTML=pages; $('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weekCount} 個星期。`;
-      $('status').textContent='行程已產生。列印版已設定為 A4 橫向、每週一頁。';
+      $('status').textContent='V1.3 行程已產生。每張卡片都會顯示原始人員組合。';
     }catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent=''}
   }
   $('build').addEventListener('click',render); $('print').addEventListener('click',()=>window.print());
