@@ -1,170 +1,77 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>個人工作行程助手 V1.3</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <style>
-    :root{--ink:#171717;--line:#333;--soft:#f3f3f3;--muted:#666;--paper:#fff}
-    *{box-sizing:border-box} body{margin:0;background:#ececec;color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif}
-    .app{max-width:1250px;margin:0 auto;padding:20px}
-    .toolbar{background:#fff;border:1px solid #bbb;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 5px 18px rgba(0,0,0,.06)}
-    h1{font-size:25px;margin:0 0 6px}.sub{color:var(--muted);font-size:14px;margin-bottom:16px}
-    .controls{display:grid;grid-template-columns:2fr .8fr 1fr 1fr auto auto;gap:10px;align-items:end}
-    label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}
-    input,button{width:100%;min-height:42px;border:1px solid #999;border-radius:8px;padding:8px 10px;font:inherit;background:#fff}
-    input[type=file]{padding:7px} button{cursor:pointer;font-weight:800}.primary{background:#222;color:#fff;border-color:#222}.ghost{background:#fff}
-    .status{margin-top:12px;padding:10px 12px;border:1px dashed #999;border-radius:8px;font-size:14px;background:#fafafa}
-    .summary{font-weight:700;margin:0 0 10px}
-    #output{display:flex;flex-direction:column;gap:20px}
-    .week-page{background:var(--paper);border:1px solid #aaa;padding:8mm 7mm 7mm;box-shadow:0 4px 14px rgba(0,0,0,.08)}
-    .week-title{text-align:center;font-weight:900;font-size:20px;margin-bottom:8px;letter-spacing:.5px}
-    .week-meta{text-align:center;font-size:13px;margin-bottom:10px}
-    .week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-left:2px solid var(--line);border-top:2px solid var(--line)}
-    .day{border-right:2px solid var(--line);border-bottom:2px solid var(--line);display:flex;flex-direction:column;min-width:0}
-    .day-head{text-align:center;background:#e7e7e7;border-bottom:2px solid var(--line);padding:7px 3px;font-weight:900;font-size:14px}
-    .day.weekend .day-head{background:#d4d4d4}.day-body{padding:5px;display:flex;flex-direction:column;gap:5px;flex:1;overflow:visible}
-    .empty{color:#888;text-align:center;margin:auto;font-size:13px}
-    .job{border:1.2px solid #555;padding:4px 5px;break-inside:avoid;background:#fff}
-    .job-title{font-size:12.5px;font-weight:900;line-height:1.25;word-break:break-word}.job-title .code{font-family:Arial,sans-serif;margin-right:3px}
-    .loc{font-size:11px;margin-top:1px;word-break:break-word}.people{font-size:11px;margin-top:2px;font-weight:900;border-top:1px dotted #999;padding-top:2px}.tasks{margin:3px 0 0;padding:3px 0 0;border-top:1px solid #aaa;font-size:11px;line-height:1.25}
-    .task{margin:0}.note{margin-top:3px;font-size:10.5px;line-height:1.2;font-weight:700}.vehicle{margin-top:3px;font-size:10.5px;border-top:1px dotted #777;padding-top:2px}
-    .footer-note{text-align:right;margin-top:7px;font-size:10px;color:#555}
-    @media(max-width:900px){.controls{grid-template-columns:1fr 1fr}.filebox{grid-column:1/-1}.week-page{overflow-x:auto}.week-grid{min-width:1050px}.day{min-height:560px}.app{padding:10px}}
-    @page{size:A4 landscape;margin:8mm}
-    @media print{
-      body{background:#fff}.app{max-width:none;padding:0}.toolbar,.summary{display:none!important}#output{gap:0}
-      .week-page{border:0;box-shadow:none;padding:0;min-height:0;page-break-after:always;width:281mm;height:194mm;overflow:hidden}.week-page:last-child{page-break-after:auto}
-      .week-title{font-size:16px;margin:0 0 2px;line-height:1.1}.week-meta{font-size:9px;margin-bottom:3px;line-height:1.1}
-      .week-grid{height:174mm;grid-template-columns:repeat(7,1fr)}.day{min-height:0;height:174mm}.day-head{font-size:10px;padding:3px 1px;line-height:1.1}.day-body{padding:3px;gap:3px}
-      .job{padding:3px 4px}.job-title{font-size:9px;line-height:1.15}.loc,.people,.tasks{font-size:7.8px;line-height:1.15}.tasks{margin-top:2px;padding-top:2px}.note,.vehicle{font-size:7.2px;line-height:1.15;margin-top:2px}.footer-note{font-size:6.5px;margin-top:2px;line-height:1}
-      .empty{font-size:9px;margin:auto}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#183153">
+<title>個人工作行程助手 V2.0</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --ink:#152033;--muted:#64748b;--line:#cbd5e1;--panel:#ffffff;--bg:#eef3f8;
+  --blue:#2563eb;--blue-soft:#dbeafe;--green:#059669;--green-soft:#d1fae5;
+  --brown:#9a5a13;--brown-soft:#f5e6d3;--purple:#7c3aed;--purple-soft:#ede9fe;
+  --orange:#d97706;--orange-soft:#ffedd5;--red:#dc2626;--red-soft:#fee2e2;
+  --teal:#0f766e;--teal-soft:#ccfbf1;--gray:#64748b;--gray-soft:#e2e8f0;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif}
+button,input{font:inherit}.app{max-width:1440px;margin:auto;padding:18px}.toolbar{background:var(--panel);border:1px solid #d7e0ea;border-radius:18px;padding:18px;box-shadow:0 8px 28px rgba(15,23,42,.08);position:sticky;top:8px;z-index:10}
+.headline{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:15px}.headline h1{font-size:25px;line-height:1.2;margin:0}.version{display:inline-block;font-size:12px;background:#183153;color:#fff;border-radius:999px;padding:4px 8px;vertical-align:middle}.sub{margin-top:6px;color:var(--muted);font-size:14px}.mode-badge{font-size:13px;background:#edf2f7;border:1px solid #d5dde7;border-radius:999px;padding:7px 10px;white-space:nowrap}
+.controls{display:grid;grid-template-columns:minmax(230px,2fr) .65fr 1fr 1fr minmax(150px,1.2fr) auto auto auto;gap:10px;align-items:end}label{display:block;font-size:12px;font-weight:800;margin:0 0 5px;color:#334155}input,button{width:100%;min-height:42px;border:1px solid #aebccd;border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink)}input:focus{outline:3px solid rgba(37,99,235,.14);border-color:#2563eb}button{cursor:pointer;font-weight:900;white-space:nowrap}.primary{background:#183153;color:white;border-color:#183153}.secondary{background:#e8eef5;border-color:#b9c6d5}.ghost{background:#fff}.toggle-on{background:#ecfdf5;border-color:#34d399;color:#065f46}
+.status{margin-top:12px;padding:10px 12px;border-radius:10px;background:#f8fafc;border:1px dashed #aab7c5;font-size:13px;color:#475569}.dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}.stat{background:#fff;border:1px solid #d8e1eb;border-radius:14px;padding:12px 14px;box-shadow:0 3px 12px rgba(15,23,42,.04)}.stat .k{font-size:12px;color:var(--muted);font-weight:800}.stat .v{font-size:21px;font-weight:950;margin-top:3px}.summary{font-size:13px;color:#475569;margin:0 0 10px;font-weight:700}
+#output{display:flex;flex-direction:column;gap:18px}.week-page{background:#fff;border:1px solid #cad5e1;border-radius:16px;padding:10px;box-shadow:0 5px 18px rgba(15,23,42,.07)}.week-top{display:flex;justify-content:space-between;align-items:end;gap:12px;padding:3px 3px 10px}.week-title{font-size:19px;font-weight:950}.week-meta{font-size:12px;color:#64748b;font-weight:800}.week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-left:1px solid #9fb0c3;border-top:1px solid #9fb0c3;overflow:hidden;border-radius:12px}.day{border-right:1px solid #9fb0c3;border-bottom:1px solid #9fb0c3;min-width:0;background:#fbfdff}.day-head{background:#eaf0f6;padding:7px 4px;text-align:center;font-size:13px;font-weight:950;border-bottom:1px solid #9fb0c3}.day.weekend .day-head{background:#f1eaf8}.day.today .day-head{background:#183153;color:#fff}.day-body{padding:5px;display:flex;flex-direction:column;gap:5px;min-height:300px}.empty{margin:auto;color:#94a3b8;font-size:12px}
+.job{background:#fff;border:1px solid #b8c5d3;border-left:5px solid var(--accent,#64748b);border-radius:9px;padding:6px 7px;break-inside:avoid;box-shadow:0 1px 3px rgba(15,23,42,.04)}.job.is-match{outline:3px solid rgba(245,158,11,.35);scroll-margin-top:145px}.job-title{font-size:12.5px;font-weight:950;line-height:1.25;word-break:break-word}.loc{font-size:10.5px;line-height:1.25;color:#475569;margin-top:2px;word-break:break-word}.people,.vehicle,.note{font-size:10.5px;line-height:1.25;margin-top:3px}.people{font-weight:850;color:#334155}.tasks{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;padding-top:4px;border-top:1px dashed #c7d2df}.task{font-size:10.5px;font-weight:900;border-radius:999px;padding:3px 6px;background:var(--task-bg,#e2e8f0);color:var(--task-fg,#334155);line-height:1.1}.note{font-weight:800;color:#9a3412}.vehicle{color:#334155;border-top:1px dotted #c7d2df;padding-top:3px}.footer-note{text-align:right;font-size:9px;color:#718096;margin-top:5px}
+body.mono .job{border-left-color:#64748b!important}body.mono .task{background:#eef2f6!important;color:#263445!important}.hidden{display:none!important}
+@media(max-width:1050px){.controls{grid-template-columns:1fr 1fr 1fr}.filebox,.searchbox{grid-column:1/-1}.dashboard{grid-template-columns:repeat(2,1fr)}.toolbar{position:static}.week-page{overflow-x:auto}.week-grid{min-width:1080px}.day-body{min-height:420px}}
+@media(max-width:620px){.app{padding:8px}.toolbar{padding:13px;border-radius:14px}.headline{display:block}.mode-badge{display:inline-block;margin-top:10px}.headline h1{font-size:21px}.controls{grid-template-columns:1fr 1fr}.filebox,.searchbox{grid-column:1/-1}.controls button{font-size:13px}.dashboard{gap:7px}.stat{padding:9px}.stat .v{font-size:18px}.week-page{padding:7px;border-radius:12px}.week-top{display:block}.week-meta{margin-top:3px}}
+@page{size:A4 landscape;margin:6mm}
+@media print{
+ body{background:#fff!important;color:#000}.toolbar,.dashboard,.summary{display:none!important}.app{max-width:none;padding:0}#output{gap:0}.week-page{border:0;border-radius:0;box-shadow:none;padding:0;width:285mm;height:198mm;overflow:hidden;page-break-after:always}.week-page:last-child{page-break-after:auto}.week-top{padding:0 1mm 2mm}.week-title{font-size:15px}.week-meta{font-size:8px}.week-grid{height:186mm;border-color:#333;border-radius:0}.day{border-color:#333;background:#fff}.day-head,.day.weekend .day-head,.day.today .day-head{background:#e7e7e7!important;color:#000!important;border-color:#333;font-size:9px;padding:2.5px 1px}.day-body{min-height:0;height:178mm;padding:2px;gap:2px}.job{border:1px solid #555!important;border-left:3px solid #333!important;border-radius:0;box-shadow:none;padding:2px 3px}.job-title{font-size:7.8px}.loc,.people,.vehicle,.note,.task{font-size:6.7px}.tasks{gap:1px;margin-top:2px;padding-top:2px}.task{background:#fff!important;color:#000!important;border:1px solid #777;border-radius:2px;padding:1px 2px}.people,.vehicle,.note{margin-top:1px}.footer-note{font-size:5.5px;margin-top:1px}.empty{font-size:8px}
+}
+</style>
 </head>
 <body>
 <div class="app">
-  <section class="toolbar">
-    <h1>個人工作行程助手 <small style="font-size:13px">V1.3</small></h1>
-    <div class="sub">匯入公司的 Excel，自動篩選人員欄包含指定代號的工作，按星期一至星期日橫向列印。</div>
-    <div class="controls">
-      <div class="filebox"><label>公司行程 Excel</label><input id="file" type="file" accept=".xlsx,.xls" /></div>
-      <div><label>人員代號</label><input id="person" value="周" /></div>
-      <div><label>開始日期</label><input id="start" type="date" /></div>
-      <div><label>結束日期</label><input id="end" type="date" /></div>
-      <button class="primary" id="build">產生行程</button>
-      <button class="ghost" id="print">列印</button>
-    </div>
-    <div id="status" class="status">請先選擇 Excel。預設日期為今天到本月底。</div>
-  </section>
-  <div id="summary" class="summary"></div>
-  <main id="output"></main>
+<section class="toolbar">
+  <div class="headline"><div><h1>個人工作行程助手 <span class="version">V2.0</span></h1><div class="sub">匯入公司行程 Excel，篩選人員、彩色分類、手機檢視與 A4 橫式黑白列印。</div></div><div class="mode-badge" id="modeBadge">🎨 彩色檢視</div></div>
+  <div class="controls">
+    <div class="filebox"><label>公司行程 Excel</label><input id="file" type="file" accept=".xlsx,.xls"></div>
+    <div><label>人員代號</label><input id="person" value="周"></div>
+    <div><label>開始日期</label><input id="start" type="date"></div>
+    <div><label>結束日期</label><input id="end" type="date"></div>
+    <div class="searchbox"><label>專案快速搜尋</label><input id="search" placeholder="例如：14502、汐東捷運"></div>
+    <button class="primary" id="build">產生行程</button>
+    <button class="toggle-on" id="colorToggle">彩色：開</button>
+    <button class="ghost" id="print">列印</button>
+  </div>
+  <div id="status" class="status">請先選擇 Excel。日期預設為今天到本月底。</div>
+</section>
+<section class="dashboard hidden" id="dashboard">
+  <div class="stat"><div class="k">原始行程</div><div class="v" id="statJobs">0</div></div>
+  <div class="stat"><div class="k">工作天數</div><div class="v" id="statDays">0</div></div>
+  <div class="stat"><div class="k">合作人員組合</div><div class="v" id="statPeople">0</div></div>
+  <div class="stat"><div class="k">車輛種類</div><div class="v" id="statVehicles">0</div></div>
+</section>
+<div id="summary" class="summary"></div>
+<main id="output"></main>
 </div>
 <script>
-(() => {
-  const $ = id => document.getElementById(id);
-  let workbook = null;
-  const pad = n => String(n).padStart(2,'0');
-  const isoLocal = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  const today = new Date();
-  $('start').value = isoLocal(today);
-  $('end').value = isoLocal(new Date(today.getFullYear(), today.getMonth()+1, 0));
-  const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function parseDate(v){
-    if(v == null || v === '') return null;
-    if(v instanceof Date && !isNaN(v)) return new Date(v.getFullYear(),v.getMonth(),v.getDate());
-    if(typeof v === 'number'){
-      const o = XLSX.SSF.parse_date_code(v); if(o) return new Date(o.y,o.m-1,o.d);
-    }
-    const s=String(v).trim().replace(/\./g,'/').replace(/-/g,'/');
-    let m=s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]);
-    return null;
-  }
-  function monday(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x}
-  function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
-  function sameDay(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
-  function dayKey(d){return isoLocal(d)}
-  function clean(v){return v == null ? '' : String(v).trim()}
-
-  $('file').addEventListener('change', async e => {
-    const f=e.target.files[0]; if(!f) return;
-    try{
-      $('status').textContent='正在讀取 Excel…';
-      const data=await f.arrayBuffer(); workbook=XLSX.read(data,{type:'array',cellDates:true});
-      const sheet=workbook.SheetNames.includes('行事曆')?'行事曆':workbook.SheetNames[0];
-      $('status').textContent=`已讀取：${f.name}｜工作表：${sheet}。按「產生行程」。`;
-    }catch(err){workbook=null;$('status').textContent='讀取失敗：'+err.message}
-  });
-
-  function extract(){
-    if(!workbook) throw new Error('請先選擇 Excel 檔案。');
-    const sheetName=workbook.SheetNames.includes('行事曆')?'行事曆':workbook.SheetNames[0];
-    const rows=XLSX.utils.sheet_to_json(workbook.Sheets[sheetName],{header:1,defval:'',raw:true});
-    const token=$('person').value.trim(); if(!token) throw new Error('請輸入人員代號。');
-    const start=new Date($('start').value+'T00:00:00'); const end=new Date($('end').value+'T23:59:59');
-    if(isNaN(start)||isNaN(end)||start>end) throw new Error('日期範圍不正確。');
-    const jobs=[];
-    // 公司行事曆格式：星期一 A:I，星期二 J:Q，之後每一天 8 欄；日期在每組最後一欄。
-    const dayStarts=[1,9,17,25,33,41,49];
-    const dateCols=[8,16,24,32,40,48,56];
-    for(let r=3;r<rows.length;r++){
-      const row=rows[r]||[]; const category=clean(row[0]);
-      for(let d=0;d<7;d++){
-        const dt=parseDate(row[dateCols[d]]); if(!dt||dt<start||dt>end) continue;
-        const s=dayStarts[d];
-        const code=clean(row[s]), name=clean(row[s+1]), location=clean(row[s+2]), person=clean(row[s+3]);
-        const vehicle=clean(row[s+4]), qty=clean(row[s+5]), note=clean(row[s+6]);
-        if(!person.includes(token)) continue;
-        if(!code&&!name&&!location&&!category) continue;
-        jobs.push({date:dt,category,code,name,location,person,vehicle,qty,note});
-      }
-    }
-    return {jobs,start,end,token};
-  }
-
-  function groupedForDay(items){
-    const map=new Map();
-    for(const j of items){
-      const key=[j.code,j.name,j.location,j.person,j.vehicle].join('|');
-      if(!map.has(key)) map.set(key,{...j,tasks:[],notes:[]});
-      const g=map.get(key);
-      if(j.category){
-        const exists=g.tasks.some(t=>t.name===j.category&&t.qty===j.qty);
-        if(!exists) g.tasks.push({name:j.category,qty:j.qty});
-      }
-      if(j.note&&!g.notes.includes(j.note)) g.notes.push(j.note);
-    }
-    return [...map.values()];
-  }
-  function renderJob(j){
-    const title=[j.code,j.name].filter(Boolean).map(esc).join(' ');
-    const loc=j.location?`<div class="loc">地點／項目：${esc(j.location)}</div>`:'';
-    const tasks=j.tasks.map(t=>`<div class="task">□ ${esc(t.name)}${t.qty?` (${esc(t.qty)})`:''}</div>`).join('');
-    const people=`<div class="people">人員：${esc(j.person || '未填')}</div>`;
-    const notes=j.notes.length?`<div class="note">★ ${esc(j.notes.join('；'))}</div>`:'';
-    const vehicle=j.vehicle?`<div class="vehicle">車輛：${esc(j.vehicle)}</div>`:'';
-    return `<section class="job"><div class="job-title"><span class="code">${title||'未命名工作'}</span></div>${loc}${people}<div class="tasks">${tasks||'□ 工作'}</div>${notes}${vehicle}</section>`;
-  }
-  function render(){
-    try{
-      const {jobs,start,end,token}=extract(); const byDate=new Map();
-      for(const j of jobs){const k=dayKey(j.date);if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(j)}
-      const first=monday(start), last=monday(end); let pages=''; let weekCount=0;
-      for(let w=new Date(first);w<=last;w=addDays(w,7)){
-        weekCount++; const we=addDays(w,6); let cells='';
-        for(let i=0;i<7;i++){
-          const d=addDays(w,i), inRange=d>=new Date(start.getFullYear(),start.getMonth(),start.getDate())&&d<=new Date(end.getFullYear(),end.getMonth(),end.getDate());
-          const gs=groupedForDay(byDate.get(dayKey(d))||[]); const body=gs.length?gs.map(renderJob).join(''):`<div class="empty">${inRange?'無行程':'—'}</div>`;
-          cells+=`<article class="day ${i>=5?'weekend':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）</header><div class="day-body">${body}</div></article>`;
-        }
-        pages+=`<section class="week-page"><div class="week-title">${esc(token)}　個人工作行程</div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div><div class="week-grid">${cells}</div><div class="footer-note">由個人工作行程助手 V1.3 整理｜人員欄包含「${esc(token)}」</div></section>`;
-      }
-      $('output').innerHTML=pages; $('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weekCount} 個星期。`;
-      $('status').textContent='V1.3 行程已產生。每張卡片都會顯示原始人員組合。';
-    }catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent=''}
-  }
-  $('build').addEventListener('click',render); $('print').addEventListener('click',()=>window.print());
+(()=>{
+const $=id=>document.getElementById(id);let workbook=null,lastJobs=[];
+const pad=n=>String(n).padStart(2,'0');const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today=new Date();$('start').value=iso(today);$('end').value=iso(new Date(today.getFullYear(),today.getMonth()+1,0));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clean=v=>v==null?'':String(v).trim();const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const monday=d=>{const x=new Date(d);x.setDate(x.getDate()-(x.getDay()+6)%7);x.setHours(0,0,0,0);return x};
+function parseDate(v){if(v==null||v==='')return null;if(v instanceof Date&&!isNaN(v))return new Date(v.getFullYear(),v.getMonth(),v.getDate());if(typeof v==='number'){const o=XLSX.SSF.parse_date_code(v);if(o)return new Date(o.y,o.m-1,o.d)}const s=String(v).trim().replace(/[.-]/g,'/');const m=s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})/);return m?new Date(+m[1],+m[2]-1,+m[3]):null}
+function catStyle(name=''){const s=name.toLowerCase();if(/地下水|井水/.test(s))return['#0f766e','#ccfbf1','#115e59'];if(/河川|地表水/.test(s))return['#2563eb','#dbeafe','#1e40af'];if(/土壤|底泥/.test(s))return['#9a5a13','#f5e6d3','#78350f'];if(/放流水|廢水|水質/.test(s))return['#7c3aed','#ede9fe','#5b21b6'];if(/營建噪音|振動/.test(s))return['#dc2626','#fee2e2','#991b1b'];if(/噪音/.test(s))return['#d97706','#ffedd5','#9a3412'];if(/空氣|pm10|pm2|空品|煙道/.test(s))return['#059669','#d1fae5','#065f46'];return['#64748b','#e2e8f0','#334155']}
+$('file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{$('status').textContent='正在讀取 Excel…';workbook=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});const sheet=workbook.SheetNames.includes('行事曆')?'行事曆':workbook.SheetNames[0];$('status').textContent=`已讀取：${f.name}｜工作表：${sheet}`;}catch(err){workbook=null;$('status').textContent='讀取失敗：'+err.message}});
+function extract(){if(!workbook)throw new Error('請先選擇 Excel 檔案。');const token=$('person').value.trim();if(!token)throw new Error('請輸入人員代號。');const start=new Date($('start').value+'T00:00:00'),end=new Date($('end').value+'T23:59:59');if(isNaN(start)||isNaN(end)||start>end)throw new Error('日期範圍不正確。');const sheet=workbook.SheetNames.includes('行事曆')?'行事曆':workbook.SheetNames[0];const rows=XLSX.utils.sheet_to_json(workbook.Sheets[sheet],{header:1,defval:'',raw:true});const dayStarts=[1,9,17,25,33,41,49],dateCols=[8,16,24,32,40,48,56],jobs=[];for(let r=3;r<rows.length;r++){const row=rows[r]||[],category=clean(row[0]);for(let d=0;d<7;d++){const dt=parseDate(row[dateCols[d]]);if(!dt||dt<start||dt>end)continue;const s=dayStarts[d],code=clean(row[s]),name=clean(row[s+1]),location=clean(row[s+2]),person=clean(row[s+3]),vehicle=clean(row[s+4]),qty=clean(row[s+5]),note=clean(row[s+6]);if(!person.includes(token)||(!code&&!name&&!location&&!category))continue;jobs.push({date:dt,category,code,name,location,person,vehicle,qty,note})}}return{jobs,start,end,token}}
+function group(items){const map=new Map();for(const j of items){const key=[j.code,j.name,j.location,j.person,j.vehicle].join('|');if(!map.has(key))map.set(key,{...j,tasks:[],notes:[]});const g=map.get(key);if(j.category&&!g.tasks.some(t=>t.name===j.category&&t.qty===j.qty))g.tasks.push({name:j.category,qty:j.qty});if(j.note&&!g.notes.includes(j.note))g.notes.push(j.note)}return[...map.values()]}
+function renderJob(j){const main=j.tasks[0]?.name||j.category||'';const [accent]=catStyle(main);const title=[j.code,j.name].filter(Boolean).join(' ')||'未命名工作';const searchText=[title,j.location,j.person,j.vehicle,...j.tasks.map(t=>t.name)].join(' ').toLowerCase();const tasks=j.tasks.map(t=>{const [,bg,fg]=catStyle(t.name);return `<span class="task" style="--task-bg:${bg};--task-fg:${fg}">${esc(t.name)}${t.qty?` (${esc(t.qty)})`:''}</span>`}).join('');return `<section class="job" data-search="${esc(searchText)}" style="--accent:${accent}"><div class="job-title">${esc(title)}</div>${j.location?`<div class="loc">📍 ${esc(j.location)}</div>`:''}<div class="people">👤 人員：${esc(j.person||'未填')}</div><div class="tasks">${tasks||'<span class="task">工作</span>'}</div>${j.notes.length?`<div class="note">★ ${esc(j.notes.join('；'))}</div>`:''}${j.vehicle?`<div class="vehicle">🚗 車輛：${esc(j.vehicle)}</div>`:''}</section>`}
+function render(){try{const {jobs,start,end,token}=extract();lastJobs=jobs;const byDate=new Map();for(const j of jobs){const k=iso(j.date);if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(j)}let pages='',weeks=0;for(let w=monday(start),last=monday(end);w<=last;w=addDays(w,7)){weeks++;const we=addDays(w,6);let cells='';for(let i=0;i<7;i++){const d=addDays(w,i),items=group(byDate.get(iso(d))||[]),isToday=iso(d)===iso(today);cells+=`<article class="day ${i>=5?'weekend':''} ${isToday?'today':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）${isToday?'・今天':''}</header><div class="day-body">${items.length?items.map(renderJob).join(''):'<div class="empty">無行程</div>'}</div></article>`}pages+=`<section class="week-page"><div class="week-top"><div class="week-title">${esc(token)}｜個人工作行程</div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div></div><div class="week-grid">${cells}</div><div class="footer-note">個人工作行程助手 V2.0｜人員欄包含「${esc(token)}」</div></section>`}$('output').innerHTML=pages;$('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weeks} 週。列印時會自動轉為黑白。`;const days=new Set(jobs.map(j=>iso(j.date))),people=new Set(jobs.map(j=>j.person).filter(Boolean)),vehicles=new Set(jobs.map(j=>j.vehicle).filter(Boolean));$('statJobs').textContent=jobs.length;$('statDays').textContent=days.size;$('statPeople').textContent=people.size;$('statVehicles').textContent=vehicles.size;$('dashboard').classList.remove('hidden');$('status').textContent='V2.0 行程已產生：彩色分類、人員顯示、搜尋與列印模式皆已啟用。';applySearch()}catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent='';$('dashboard').classList.add('hidden')}}
+function applySearch(){const q=$('search').value.trim().toLowerCase();document.querySelectorAll('.job').forEach(el=>el.classList.toggle('is-match',!!q&&el.dataset.search.includes(q)));if(q){const first=document.querySelector('.job.is-match');if(first)first.scrollIntoView({behavior:'smooth',block:'center'})}}
+$('build').addEventListener('click',render);$('search').addEventListener('input',applySearch);$('print').addEventListener('click',()=>window.print());$('colorToggle').addEventListener('click',()=>{document.body.classList.toggle('mono');const mono=document.body.classList.contains('mono');$('colorToggle').textContent=mono?'彩色：關':'彩色：開';$('colorToggle').classList.toggle('toggle-on',!mono);$('modeBadge').textContent=mono?'⚫ 黑白檢視':'🎨 彩色檢視'});
 })();
 </script>
 </body>
