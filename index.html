@@ -28,7 +28,7 @@
     .empty{color:#888;text-align:center;margin:auto;font-size:13px}
     .job{border:1.2px solid #555;padding:4px 5px;break-inside:avoid;background:#fff}
     .job-title{font-size:12.5px;font-weight:900;line-height:1.25;word-break:break-word}.job-title .code{font-family:Arial,sans-serif;margin-right:3px}
-    .loc{font-size:11px;margin-top:1px;word-break:break-word}.tasks{margin:3px 0 0;padding:3px 0 0;border-top:1px solid #aaa;font-size:11px;line-height:1.25}
+    .loc{font-size:11px;margin-top:1px;word-break:break-word}.people{font-size:11px;margin-top:1px;font-weight:700}.tasks{margin:3px 0 0;padding:3px 0 0;border-top:1px solid #aaa;font-size:11px;line-height:1.25}
     .task{margin:0}.note{margin-top:3px;font-size:10.5px;line-height:1.2;font-weight:700}.vehicle{margin-top:3px;font-size:10.5px;border-top:1px dotted #777;padding-top:2px}
     .footer-note{text-align:right;margin-top:7px;font-size:10px;color:#555}
     @media(max-width:900px){.controls{grid-template-columns:1fr 1fr}.filebox{grid-column:1/-1}.week-page{overflow-x:auto}.week-grid{min-width:1050px}.day{min-height:560px}.app{padding:10px}}
@@ -38,7 +38,7 @@
       .week-page{border:0;box-shadow:none;padding:0;min-height:0;page-break-after:always;width:281mm;height:194mm;overflow:hidden}.week-page:last-child{page-break-after:auto}
       .week-title{font-size:16px;margin:0 0 2px;line-height:1.1}.week-meta{font-size:9px;margin-bottom:3px;line-height:1.1}
       .week-grid{height:174mm;grid-template-columns:repeat(7,1fr)}.day{min-height:0;height:174mm}.day-head{font-size:10px;padding:3px 1px;line-height:1.1}.day-body{padding:3px;gap:3px}
-      .job{padding:3px 4px}.job-title{font-size:9px;line-height:1.15}.loc,.tasks{font-size:7.8px;line-height:1.15}.tasks{margin-top:2px;padding-top:2px}.note,.vehicle{font-size:7.2px;line-height:1.15;margin-top:2px}.footer-note{font-size:6.5px;margin-top:2px;line-height:1}
+      .job{padding:3px 4px}.job-title{font-size:9px;line-height:1.15}.loc,.people,.tasks{font-size:7.8px;line-height:1.15}.tasks{margin-top:2px;padding-top:2px}.note,.vehicle{font-size:7.2px;line-height:1.15;margin-top:2px}.footer-note{font-size:6.5px;margin-top:2px;line-height:1}
       .empty{font-size:9px;margin:auto}
     }
   </style>
@@ -126,7 +126,7 @@
   function groupedForDay(items){
     const map=new Map();
     for(const j of items){
-      const key=[j.code,j.name,j.location,j.vehicle].join('|');
+      const key=[j.code,j.name,j.location,j.person,j.vehicle].join('|');
       if(!map.has(key)) map.set(key,{...j,tasks:[],notes:[]});
       const g=map.get(key);
       if(j.category){
@@ -141,9 +141,10 @@
     const title=[j.code,j.name].filter(Boolean).map(esc).join(' ');
     const loc=j.location?`<div class="loc">地點／項目：${esc(j.location)}</div>`:'';
     const tasks=j.tasks.map(t=>`<div class="task">□ ${esc(t.name)}${t.qty?` (${esc(t.qty)})`:''}</div>`).join('');
+    const people=j.person?`<div class="people">人員：${esc(j.person)}</div>`:'';
     const notes=j.notes.length?`<div class="note">★ ${esc(j.notes.join('；'))}</div>`:'';
     const vehicle=j.vehicle?`<div class="vehicle">車輛：${esc(j.vehicle)}</div>`:'';
-    return `<section class="job"><div class="job-title"><span class="code">${title||'未命名工作'}</span></div>${loc}<div class="tasks">${tasks||'□ 工作'}</div>${notes}${vehicle}</section>`;
+    return `<section class="job"><div class="job-title"><span class="code">${title||'未命名工作'}</span></div>${loc}${people}<div class="tasks">${tasks||'□ 工作'}</div>${notes}${vehicle}</section>`;
   }
   function render(){
     try{
