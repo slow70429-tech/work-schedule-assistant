@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183153">
-<title>個人工作行程助手 V2.9</title>
+<title>個人工作行程助手 V2.9.1</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -33,7 +33,7 @@ body.mono .task{background:#eef2f6!important;color:#263445!important}.hidden{dis
 <body>
 <div class="app">
 <section class="toolbar">
-  <div class="headline"><div><h1>個人工作行程助手 <span class="version">V2.9</span></h1><div class="sub">匯入公司行程 Excel，篩選人員、彩色分類、手機檢視與 A4 橫式黑白列印。</div></div><div class="mode-badge" id="modeBadge">🎨 彩色檢視</div></div>
+  <div class="headline"><div><h1>個人工作行程助手 <span class="version">V2.9.1</span></h1><div class="sub">匯入公司行程 Excel，篩選人員、彩色分類、手機檢視與 A4 橫式黑白列印。</div></div><div class="mode-badge" id="modeBadge">🎨 彩色檢視</div></div>
   <div class="controls">
     <div class="filebox"><label>公司行程 Excel</label><input id="file" type="file" accept=".xlsx,.xls"></div>
     <div><label>人員代號</label><input id="person" value="周"></div>
@@ -69,20 +69,32 @@ const today=new Date();
 function setWeek(base){
  const m=monday(base),s=iso(m),e=iso(addDays(m,6));
  $('start').value=s;$('end').value=e;
- if($('weekSelect'))$('weekSelect').value=s;
-}
-function fillWeekSelect(){
- const sel=$('weekSelect');if(!sel)return;
- sel.innerHTML='';
- const center=monday(today);
- for(let i=-8;i<=8;i++){
-  const s=addDays(center,i*7),e=addDays(s,6),val=iso(s);
-  const op=document.createElement('option');op.value=val;
-  op.textContent=`${s.getMonth()+1}/${s.getDate()} ～ ${e.getMonth()+1}/${e.getDate()}${i===0?'（本週）':''}`;
-  sel.appendChild(op);
+ const sel=$('weekSelect');
+ if(sel){
+   let exists=[...sel.options].some(o=>o.value===s);
+   if(!exists){
+     const op=document.createElement('option');
+     op.value=s;op.textContent=`${m.getMonth()+1}/${m.getDate()} ～ ${e.slice(5,7).replace(/^0/,'')}/${e.slice(8,10).replace(/^0/,'')}`;
+     sel.appendChild(op);
+   }
+   sel.value=s;
  }
 }
-fillWeekSelect();setWeek(today);
+function fillWeekSelect(centerDate=today){
+ const sel=$('weekSelect');if(!sel)return;
+ const center=monday(centerDate);
+ const current=iso(monday(today));
+ sel.innerHTML='';
+ for(let i=-8;i<=8;i++){
+   const s=addDays(center,i*7),e=addDays(s,6);
+   const op=document.createElement('option');
+   op.value=iso(s);
+   op.textContent=`${s.getFullYear()}/${s.getMonth()+1}/${s.getDate()} ～ ${e.getMonth()+1}/${e.getDate()}${iso(s)===current?'（本週）':''}`;
+   sel.appendChild(op);
+ }
+}
+fillWeekSelect(today);
+setWeek(today);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean=v=>v==null?'':String(v).trim();const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 const monday=d=>{const x=new Date(d);x.setDate(x.getDate()-(x.getDay()+6)%7);x.setHours(0,0,0,0);return x};
@@ -108,11 +120,11 @@ const parts=statKeys.map(k=>`${k} ${categoryCases[k]?.size||0}個案子・${tota
 const rangeStats=parts.length?'工作統計：'+parts.join('｜'):'工作統計：無';
 
 
-const byDate=new Map();for(const j of jobs){const k=iso(j.date);if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(j)}let pages='',weeks=0;for(let w=monday(start),last=monday(end);w<=last;w=addDays(w,7)){weeks++;const we=addDays(w,6);let cells='';for(let i=0;i<7;i++){const d=addDays(w,i),dayRaw=(byDate.get(iso(d))||[]).slice().sort((a,b)=>{const ac=clean(a.code),bc=clean(b.code);const cmp=ac.localeCompare(bc,'zh-Hant',{numeric:true,sensitivity:'base'});if(cmp!==0)return cmp;return clean(a.name).localeCompare(clean(b.name),'zh-Hant',{numeric:true,sensitivity:'base'});}),items=group(dayRaw),isToday=iso(d)===iso(today);cells+=`<article class="day ${i>=5?'weekend':''} ${isToday?'today':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）${isToday?'・今天':''}</header><div class="day-body">${items.length?items.map(renderJob).join(''):'<div class="empty">無行程</div>'}</div></article>`}pages+=`<section class="week-page"><div class="week-top"><div><div class="week-title">${esc(tokens.join('＋'))}｜個人工作行程</div><div class="week-range-stats">${esc(rangeStats)}</div></div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div></div><div class="week-grid">${cells}</div><div class="footer-note">個人工作行程助手 V2.9｜人員欄包含「${esc(tokens.join('、'))}」任一代號</div></section>`}$('output').innerHTML=pages;$('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weeks} 週。列印時會自動轉為黑白。`;$('categoryStats').textContent=rangeStats;const days=new Set(jobs.map(j=>iso(j.date))),people=new Set(jobs.map(j=>j.person).filter(Boolean)),vehicles=new Set(jobs.map(j=>j.vehicle).filter(Boolean));$('statJobs').textContent=jobs.length;$('statDays').textContent=days.size;$('statPeople').textContent=people.size;$('statVehicles').textContent=vehicles.size;$('dashboard').classList.remove('hidden');$('status').textContent='V2.9 行程已產生：海域水質、海域底泥已分開統計，並以「個案子・個點位」顯示。';applySearch()}catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent='';$('categoryStats').textContent='';$('dashboard').classList.add('hidden')}}
+const byDate=new Map();for(const j of jobs){const k=iso(j.date);if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(j)}let pages='',weeks=0;for(let w=monday(start),last=monday(end);w<=last;w=addDays(w,7)){weeks++;const we=addDays(w,6);let cells='';for(let i=0;i<7;i++){const d=addDays(w,i),dayRaw=(byDate.get(iso(d))||[]).slice().sort((a,b)=>{const ac=clean(a.code),bc=clean(b.code);const cmp=ac.localeCompare(bc,'zh-Hant',{numeric:true,sensitivity:'base'});if(cmp!==0)return cmp;return clean(a.name).localeCompare(clean(b.name),'zh-Hant',{numeric:true,sensitivity:'base'});}),items=group(dayRaw),isToday=iso(d)===iso(today);cells+=`<article class="day ${i>=5?'weekend':''} ${isToday?'today':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）${isToday?'・今天':''}</header><div class="day-body">${items.length?items.map(renderJob).join(''):'<div class="empty">無行程</div>'}</div></article>`}pages+=`<section class="week-page"><div class="week-top"><div><div class="week-title">${esc(tokens.join('＋'))}｜個人工作行程</div><div class="week-range-stats">${esc(rangeStats)}</div></div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div></div><div class="week-grid">${cells}</div><div class="footer-note">個人工作行程助手 V2.9.1｜人員欄包含「${esc(tokens.join('、'))}」任一代號</div></section>`}$('output').innerHTML=pages;$('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weeks} 週。列印時會自動轉為黑白。`;$('categoryStats').textContent=rangeStats;const days=new Set(jobs.map(j=>iso(j.date))),people=new Set(jobs.map(j=>j.person).filter(Boolean)),vehicles=new Set(jobs.map(j=>j.vehicle).filter(Boolean));$('statJobs').textContent=jobs.length;$('statDays').textContent=days.size;$('statPeople').textContent=people.size;$('statVehicles').textContent=vehicles.size;$('dashboard').classList.remove('hidden');$('status').textContent='V2.9.1 行程已產生：海域水質、海域底泥已分開統計，並以「個案子・個點位」顯示。';applySearch()}catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent='';$('categoryStats').textContent='';$('dashboard').classList.add('hidden')}}
 function applySearch(){const q=$('search').value.trim().toLowerCase();document.querySelectorAll('.job').forEach(el=>el.classList.toggle('is-match',!!q&&el.dataset.search.includes(q)));if(q){const first=document.querySelector('.job.is-match');if(first)first.scrollIntoView({behavior:'smooth',block:'center'})}}
-$('prevWeek').addEventListener('click',()=>{const d=new Date($('start').value+'T00:00:00');setWeek(addDays(d,-7))});
-$('nextWeek').addEventListener('click',()=>{const d=new Date($('start').value+'T00:00:00');setWeek(addDays(d,7))});
-$('thisWeek').addEventListener('click',()=>setWeek(today));
+$('prevWeek').addEventListener('click',()=>{const d=new Date($('start').value+'T00:00:00');const target=addDays(d,-7);fillWeekSelect(target);setWeek(target)});
+$('nextWeek').addEventListener('click',()=>{const d=new Date($('start').value+'T00:00:00');const target=addDays(d,7);fillWeekSelect(target);setWeek(target)});
+$('thisWeek').addEventListener('click',()=>{fillWeekSelect(today);setWeek(today)});
 $('weekSelect').addEventListener('change',()=>{const d=new Date($('weekSelect').value+'T00:00:00');setWeek(d)});
 $('start').addEventListener('change',()=>{$('weekSelect').value=''});
 $('end').addEventListener('change',()=>{$('weekSelect').value=''});
