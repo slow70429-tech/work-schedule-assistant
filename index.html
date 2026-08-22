@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183153">
-<title>個人工作行程助手 V2.6</title>
+<title>個人工作行程助手 V2.7</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -33,7 +33,7 @@ body.mono .task{background:#eef2f6!important;color:#263445!important}.hidden{dis
 <body>
 <div class="app">
 <section class="toolbar">
-  <div class="headline"><div><h1>個人工作行程助手 <span class="version">V2.6</span></h1><div class="sub">匯入公司行程 Excel，篩選人員、彩色分類、手機檢視與 A4 橫式黑白列印。</div></div><div class="mode-badge" id="modeBadge">🎨 彩色檢視</div></div>
+  <div class="headline"><div><h1>個人工作行程助手 <span class="version">V2.7</span></h1><div class="sub">匯入公司行程 Excel，篩選人員、彩色分類、手機檢視與 A4 橫式黑白列印。</div></div><div class="mode-badge" id="modeBadge">🎨 彩色檢視</div></div>
   <div class="controls">
     <div class="filebox"><label>公司行程 Excel</label><input id="file" type="file" accept=".xlsx,.xls"></div>
     <div><label>人員代號</label><input id="person" value="周"></div>
@@ -70,9 +70,23 @@ function extract(){if(!workbook)throw new Error('請先選擇 Excel 檔案。');
 function group(items){const map=new Map();for(const j of items){const key=[j.code,j.name,j.location,j.person,j.vehicle].join('|');if(!map.has(key))map.set(key,{...j,tasks:[],notes:[]});const g=map.get(key);if(j.category&&!g.tasks.some(t=>t.name===j.category&&t.qty===j.qty))g.tasks.push({name:j.category,qty:j.qty});if(j.note&&!g.notes.includes(j.note))g.notes.push(j.note)}return[...map.values()]}
 function renderJob(j){const main=j.tasks[0]?.name||j.category||'';const [accent]=catStyle(main);const title=[j.code,j.name].filter(Boolean).join(' ')||'未命名工作';const searchText=[title,j.location,j.person,j.vehicle,...j.tasks.map(t=>t.name)].join(' ').toLowerCase();const tasks=j.tasks.map(t=>{const [,bg,fg]=catStyle(t.name);return `<span class="task" style="--task-bg:${bg};--task-fg:${fg}">${esc(t.name)}${t.qty?` (${esc(t.qty)})`:''}</span>`}).join('');return `<section class="job" data-search="${esc(searchText)}" style="--accent:${accent}"><div class="job-title">${esc(title)}</div>${j.location?`<div class="loc">📍 ${esc(j.location)}</div>`:''}<div class="people">👤 人員：${esc(j.person||'未填')}</div><div class="tasks">${tasks||'<span class="task">工作</span>'}</div>${j.notes.length?`<div class="note">★ ${esc(j.notes.join('；'))}</div>`:''}${j.vehicle?`<div class="vehicle">🚗 車輛：${esc(j.vehicle)}</div>`:''}</section>`}
 function qtyNum(v){const m=String(v||'').replace(/,/g,'').match(/-?\d+(?:\.\d+)?/);return m?Number(m[0]):1}
-function catKey(n=''){const s=String(n||'').trim();if(/營建噪音/.test(s))return'營建噪音';if(/環境噪音|環境振動/.test(s))return'環境噪音';if(/海水|海域|海洋/.test(s))return'海水';if(/地下水|井水/.test(s))return'地下水';if(/河川水|河川|地表水/.test(s))return'河川水';if(/底泥|沉積物/.test(s))return'底泥';if(/土壤/.test(s))return'土壤';if(/放流水|廢水/.test(s))return'放流水';if(/PM10|PM2\.?5|空氣|空品|煙道/i.test(s))return'PM10';if(/噪音|振動/.test(s))return'環境噪音';return s||'其他'}
+function catKey(n=''){
+ const s=String(n||'').trim();
+ if(/營建噪音/.test(s))return'營建噪音';
+ if(/環境噪音|環境振動/.test(s))return'環境噪音';
+ if(/海域底泥|海洋底泥|海底底泥/.test(s))return'海域底泥';
+ if(/海域水質|海水水質|海洋水質|海水|海域|海洋/.test(s))return'海域水質';
+ if(/地下水|井水/.test(s))return'地下水';
+ if(/河川水|河川|地表水/.test(s))return'河川水';
+ if(/底泥|沉積物/.test(s))return'底泥';
+ if(/土壤/.test(s))return'土壤';
+ if(/放流水|廢水/.test(s))return'放流水';
+ if(/PM10|PM2\.?5|空氣|空品|煙道/i.test(s))return'PM10';
+ if(/噪音|振動/.test(s))return'環境噪音';
+ return s||'其他';
+}
 function render(){try{const {jobs,start,end,token}=extract();lastJobs=jobs;const totals={};for(const j of jobs){const k=catKey(j.category);totals[k]=(totals[k]||0)+qtyNum(j.qty)}
-const order=['河川水','地下水','海水','放流水','土壤','底泥','PM10','環境噪音','營建噪音'];
+const order=['河川水','地下水','海域水質','海域底泥','放流水','土壤','底泥','PM10','環境噪音','營建噪音'];
 const extras=Object.keys(totals).filter(k=>!order.includes(k)&&totals[k]).sort((a,b)=>a.localeCompare(b,'zh-Hant'));
 const statKeys=[...order.filter(k=>totals[k]),...extras];
 const categoryCases={};
@@ -81,11 +95,11 @@ for(const j of jobs){
  if(!categoryCases[k])categoryCases[k]=new Set();
  categoryCases[k].add(clean(j.code)||clean(j.name)||'未編號');
 }
-const parts=statKeys.map(k=>`${k} ${categoryCases[k]?.size||0}案${totals[k]}點`);
+const parts=statKeys.map(k=>`${k} ${categoryCases[k]?.size||0}個案子・${totals[k]}個點位`);
 const rangeStats=parts.length?'工作統計：'+parts.join('｜'):'工作統計：無';
 
 
-const byDate=new Map();for(const j of jobs){const k=iso(j.date);if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(j)}let pages='',weeks=0;for(let w=monday(start),last=monday(end);w<=last;w=addDays(w,7)){weeks++;const we=addDays(w,6);let cells='';for(let i=0;i<7;i++){const d=addDays(w,i),dayRaw=(byDate.get(iso(d))||[]).slice().sort((a,b)=>{const ac=clean(a.code),bc=clean(b.code);const cmp=ac.localeCompare(bc,'zh-Hant',{numeric:true,sensitivity:'base'});if(cmp!==0)return cmp;return clean(a.name).localeCompare(clean(b.name),'zh-Hant',{numeric:true,sensitivity:'base'});}),items=group(dayRaw),isToday=iso(d)===iso(today);cells+=`<article class="day ${i>=5?'weekend':''} ${isToday?'today':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）${isToday?'・今天':''}</header><div class="day-body">${items.length?items.map(renderJob).join(''):'<div class="empty">無行程</div>'}</div></article>`}pages+=`<section class="week-page"><div class="week-top"><div><div class="week-title">${esc(token)}｜個人工作行程</div><div class="week-range-stats">${esc(rangeStats)}</div></div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div></div><div class="week-grid">${cells}</div><div class="footer-note">個人工作行程助手 V2.6｜人員欄包含「${esc(token)}」</div></section>`}$('output').innerHTML=pages;$('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weeks} 週。列印時會自動轉為黑白。`;$('categoryStats').textContent=rangeStats;const days=new Set(jobs.map(j=>iso(j.date))),people=new Set(jobs.map(j=>j.person).filter(Boolean)),vehicles=new Set(jobs.map(j=>j.vehicle).filter(Boolean));$('statJobs').textContent=jobs.length;$('statDays').textContent=days.size;$('statPeople').textContent=people.size;$('statVehicles').textContent=vehicles.size;$('dashboard').classList.remove('hidden');$('status').textContent='V2.6 行程已產生：各工作類別以「案數＋點數」精簡統計，列印時會一併顯示。';applySearch()}catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent='';$('categoryStats').textContent='';$('dashboard').classList.add('hidden')}}
+const byDate=new Map();for(const j of jobs){const k=iso(j.date);if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(j)}let pages='',weeks=0;for(let w=monday(start),last=monday(end);w<=last;w=addDays(w,7)){weeks++;const we=addDays(w,6);let cells='';for(let i=0;i<7;i++){const d=addDays(w,i),dayRaw=(byDate.get(iso(d))||[]).slice().sort((a,b)=>{const ac=clean(a.code),bc=clean(b.code);const cmp=ac.localeCompare(bc,'zh-Hant',{numeric:true,sensitivity:'base'});if(cmp!==0)return cmp;return clean(a.name).localeCompare(clean(b.name),'zh-Hant',{numeric:true,sensitivity:'base'});}),items=group(dayRaw),isToday=iso(d)===iso(today);cells+=`<article class="day ${i>=5?'weekend':''} ${isToday?'today':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）${isToday?'・今天':''}</header><div class="day-body">${items.length?items.map(renderJob).join(''):'<div class="empty">無行程</div>'}</div></article>`}pages+=`<section class="week-page"><div class="week-top"><div><div class="week-title">${esc(token)}｜個人工作行程</div><div class="week-range-stats">${esc(rangeStats)}</div></div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div></div><div class="week-grid">${cells}</div><div class="footer-note">個人工作行程助手 V2.7｜人員欄包含「${esc(token)}」</div></section>`}$('output').innerHTML=pages;$('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weeks} 週。列印時會自動轉為黑白。`;$('categoryStats').textContent=rangeStats;const days=new Set(jobs.map(j=>iso(j.date))),people=new Set(jobs.map(j=>j.person).filter(Boolean)),vehicles=new Set(jobs.map(j=>j.vehicle).filter(Boolean));$('statJobs').textContent=jobs.length;$('statDays').textContent=days.size;$('statPeople').textContent=people.size;$('statVehicles').textContent=vehicles.size;$('dashboard').classList.remove('hidden');$('status').textContent='V2.7 行程已產生：海域水質、海域底泥已分開統計，並以「個案子・個點位」顯示。';applySearch()}catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent='';$('categoryStats').textContent='';$('dashboard').classList.add('hidden')}}
 function applySearch(){const q=$('search').value.trim().toLowerCase();document.querySelectorAll('.job').forEach(el=>el.classList.toggle('is-match',!!q&&el.dataset.search.includes(q)));if(q){const first=document.querySelector('.job.is-match');if(first)first.scrollIntoView({behavior:'smooth',block:'center'})}}
 $('build').addEventListener('click',render);$('search').addEventListener('input',applySearch);$('print').addEventListener('click',()=>window.print());$('colorToggle').addEventListener('click',()=>{document.body.classList.toggle('mono');const mono=document.body.classList.contains('mono');$('colorToggle').textContent=mono?'彩色：關':'彩色：開';$('colorToggle').classList.toggle('toggle-on',!mono);$('modeBadge').textContent=mono?'⚫ 黑白檢視':'🎨 彩色檢視'});
 })();
