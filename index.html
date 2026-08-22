@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183153">
-<title>個人工作行程助手 V2.8</title>
+<title>個人工作行程助手 V2.9</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -17,7 +17,7 @@
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif}
 button,input{font:inherit}.app{max-width:1440px;margin:auto;padding:18px}.toolbar{background:var(--panel);border:1px solid #d7e0ea;border-radius:18px;padding:18px;box-shadow:0 8px 28px rgba(15,23,42,.08);position:sticky;top:8px;z-index:10}
 .headline{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:15px}.headline h1{font-size:25px;line-height:1.2;margin:0}.version{display:inline-block;font-size:12px;background:#183153;color:#fff;border-radius:999px;padding:4px 8px;vertical-align:middle}.sub{margin-top:6px;color:var(--muted);font-size:14px}.mode-badge{font-size:13px;background:#edf2f7;border:1px solid #d5dde7;border-radius:999px;padding:7px 10px;white-space:nowrap}
-.controls{display:grid;grid-template-columns:minmax(230px,2fr) .65fr 1fr 1fr minmax(150px,1.2fr) auto auto auto;gap:10px;align-items:end}label{display:block;font-size:12px;font-weight:800;margin:0 0 5px;color:#334155}input,button{width:100%;min-height:42px;border:1px solid #aebccd;border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink)}input:focus{outline:3px solid rgba(37,99,235,.14);border-color:#2563eb}button{cursor:pointer;font-weight:900;white-space:nowrap}.primary{background:#183153;color:white;border-color:#183153}.secondary{background:#e8eef5;border-color:#b9c6d5}.ghost{background:#fff}.toggle-on{background:#ecfdf5;border-color:#34d399;color:#065f46}
+.week-nav{display:flex;gap:7px;align-items:end}.week-nav button{min-width:0;padding:8px}.week-select{min-width:170px}.controls{display:grid;grid-template-columns:minmax(220px,1.8fr) .55fr .85fr .85fr 1.05fr 1fr minmax(145px,1.1fr) auto auto auto;gap:10px;align-items:end}label{display:block;font-size:12px;font-weight:800;margin:0 0 5px;color:#334155}input,button{width:100%;min-height:42px;border:1px solid #aebccd;border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink)}input:focus{outline:3px solid rgba(37,99,235,.14);border-color:#2563eb}button{cursor:pointer;font-weight:900;white-space:nowrap}.primary{background:#183153;color:white;border-color:#183153}.secondary{background:#e8eef5;border-color:#b9c6d5}.ghost{background:#fff}.toggle-on{background:#ecfdf5;border-color:#34d399;color:#065f46}
 .status{margin-top:12px;padding:10px 12px;border-radius:10px;background:#f8fafc;border:1px dashed #aab7c5;font-size:13px;color:#475569}.dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}.stat{background:#fff;border:1px solid #d8e1eb;border-radius:14px;padding:12px 14px;box-shadow:0 3px 12px rgba(15,23,42,.04)}.stat .k{font-size:12px;color:var(--muted);font-weight:800}.stat .v{font-size:21px;font-weight:950;margin-top:3px}.summary{font-size:13px;color:#475569;margin:0 0 10px;font-weight:700}
 #output{display:flex;flex-direction:column;gap:18px}.week-page{background:#fff;border:1px solid #cad5e1;border-radius:16px;padding:10px;box-shadow:0 5px 18px rgba(15,23,42,.07)}.week-top{display:flex;justify-content:space-between;align-items:end;gap:12px;padding:3px 3px 10px}.week-title{font-size:19px;font-weight:950}.week-range-stats{font-size:11px;color:#334155;font-weight:800;margin-top:4px;line-height:1.45}.week-meta{font-size:12px;color:#64748b;font-weight:800}.week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-left:1px solid #9fb0c3;border-top:1px solid #9fb0c3;overflow:hidden;border-radius:12px}.day{border-right:1px solid #9fb0c3;border-bottom:1px solid #9fb0c3;min-width:0;background:#fbfdff}.day-head{background:#eaf0f6;padding:7px 4px;text-align:center;font-size:13px;font-weight:950;border-bottom:1px solid #9fb0c3}.day.weekend .day-head{background:#f1eaf8}.day.today .day-head{background:#183153;color:#fff}.day-body{padding:5px;display:flex;flex-direction:column;gap:5px;min-height:300px}.empty{margin:auto;color:#94a3b8;font-size:12px}
 .job{background:#fff;border:1px solid #b8c5d3;border-radius:9px;padding:6px 7px;break-inside:avoid;box-shadow:0 1px 3px rgba(15,23,42,.04)}.job.is-match{outline:3px solid rgba(245,158,11,.35);scroll-margin-top:145px}.job-title{font-size:12.5px;font-weight:950;line-height:1.25;word-break:break-word}.loc{font-size:10.5px;line-height:1.25;color:#475569;margin-top:2px;word-break:break-word}.people,.vehicle,.note{font-size:10.5px;line-height:1.25;margin-top:3px}.people{font-weight:850;color:#334155}.tasks{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;padding-top:4px;border-top:1px dashed #c7d2df}.task{font-size:10.5px;font-weight:900;border-radius:999px;padding:3px 6px;background:var(--task-bg,#e2e8f0);color:var(--task-fg,#334155);line-height:1.1}.note{font-weight:800;color:#9a3412}.vehicle{color:#334155;border-top:1px dotted #c7d2df;padding-top:3px}.footer-note{text-align:right;font-size:9px;color:#718096;margin-top:5px}
@@ -33,18 +33,24 @@ body.mono .task{background:#eef2f6!important;color:#263445!important}.hidden{dis
 <body>
 <div class="app">
 <section class="toolbar">
-  <div class="headline"><div><h1>個人工作行程助手 <span class="version">V2.8</span></h1><div class="sub">匯入公司行程 Excel，篩選人員、彩色分類、手機檢視與 A4 橫式黑白列印。</div></div><div class="mode-badge" id="modeBadge">🎨 彩色檢視</div></div>
+  <div class="headline"><div><h1>個人工作行程助手 <span class="version">V2.9</span></h1><div class="sub">匯入公司行程 Excel，篩選人員、彩色分類、手機檢視與 A4 橫式黑白列印。</div></div><div class="mode-badge" id="modeBadge">🎨 彩色檢視</div></div>
   <div class="controls">
     <div class="filebox"><label>公司行程 Excel</label><input id="file" type="file" accept=".xlsx,.xls"></div>
     <div><label>人員代號</label><input id="person" value="周"></div>
     <div><label>開始日期</label><input id="start" type="date"></div>
     <div><label>結束日期</label><input id="end" type="date"></div>
+    <div class="week-select"><label>快速選週</label><select id="weekSelect" style="width:100%;min-height:42px;border:1px solid #aebccd;border-radius:10px;padding:8px 10px;background:#fff"></select></div>
+    <div class="week-nav">
+      <button class="secondary" id="prevWeek" type="button" title="上一週">◀</button>
+      <button class="secondary" id="thisWeek" type="button">本週</button>
+      <button class="secondary" id="nextWeek" type="button" title="下一週">▶</button>
+    </div>
     <div class="searchbox"><label>專案快速搜尋</label><input id="search" placeholder="例如：14502、汐東捷運"></div>
     <button class="primary" id="build">產生行程</button>
     <button class="toggle-on" id="colorToggle">彩色：開</button>
     <button class="ghost" id="print">列印</button>
   </div>
-  <div id="status" class="status">請先選擇 Excel。日期預設為今天到本月底。</div>
+  <div id="status" class="status">請先選擇 Excel。日期預設為本週一～週日，可用左右箭頭、快速選週或自行選日期。</div>
 </section>
 <section class="dashboard hidden" id="dashboard">
   <div class="stat"><div class="k">原始行程</div><div class="v" id="statJobs">0</div></div>
@@ -59,7 +65,24 @@ body.mono .task{background:#eef2f6!important;color:#263445!important}.hidden{dis
 (()=>{
 const $=id=>document.getElementById(id);let workbook=null,lastJobs=[];
 const pad=n=>String(n).padStart(2,'0');const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-const today=new Date();$('start').value=iso(today);$('end').value=iso(new Date(today.getFullYear(),today.getMonth()+1,0));
+const today=new Date();
+function setWeek(base){
+ const m=monday(base),s=iso(m),e=iso(addDays(m,6));
+ $('start').value=s;$('end').value=e;
+ if($('weekSelect'))$('weekSelect').value=s;
+}
+function fillWeekSelect(){
+ const sel=$('weekSelect');if(!sel)return;
+ sel.innerHTML='';
+ const center=monday(today);
+ for(let i=-8;i<=8;i++){
+  const s=addDays(center,i*7),e=addDays(s,6),val=iso(s);
+  const op=document.createElement('option');op.value=val;
+  op.textContent=`${s.getMonth()+1}/${s.getDate()} ～ ${e.getMonth()+1}/${e.getDate()}${i===0?'（本週）':''}`;
+  sel.appendChild(op);
+ }
+}
+fillWeekSelect();setWeek(today);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean=v=>v==null?'':String(v).trim();const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 const monday=d=>{const x=new Date(d);x.setDate(x.getDate()-(x.getDay()+6)%7);x.setHours(0,0,0,0);return x};
@@ -85,8 +108,14 @@ const parts=statKeys.map(k=>`${k} ${categoryCases[k]?.size||0}個案子・${tota
 const rangeStats=parts.length?'工作統計：'+parts.join('｜'):'工作統計：無';
 
 
-const byDate=new Map();for(const j of jobs){const k=iso(j.date);if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(j)}let pages='',weeks=0;for(let w=monday(start),last=monday(end);w<=last;w=addDays(w,7)){weeks++;const we=addDays(w,6);let cells='';for(let i=0;i<7;i++){const d=addDays(w,i),dayRaw=(byDate.get(iso(d))||[]).slice().sort((a,b)=>{const ac=clean(a.code),bc=clean(b.code);const cmp=ac.localeCompare(bc,'zh-Hant',{numeric:true,sensitivity:'base'});if(cmp!==0)return cmp;return clean(a.name).localeCompare(clean(b.name),'zh-Hant',{numeric:true,sensitivity:'base'});}),items=group(dayRaw),isToday=iso(d)===iso(today);cells+=`<article class="day ${i>=5?'weekend':''} ${isToday?'today':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）${isToday?'・今天':''}</header><div class="day-body">${items.length?items.map(renderJob).join(''):'<div class="empty">無行程</div>'}</div></article>`}pages+=`<section class="week-page"><div class="week-top"><div><div class="week-title">${esc(tokens.join('＋'))}｜個人工作行程</div><div class="week-range-stats">${esc(rangeStats)}</div></div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div></div><div class="week-grid">${cells}</div><div class="footer-note">個人工作行程助手 V2.8｜人員欄包含「${esc(tokens.join('、'))}」任一代號</div></section>`}$('output').innerHTML=pages;$('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weeks} 週。列印時會自動轉為黑白。`;$('categoryStats').textContent=rangeStats;const days=new Set(jobs.map(j=>iso(j.date))),people=new Set(jobs.map(j=>j.person).filter(Boolean)),vehicles=new Set(jobs.map(j=>j.vehicle).filter(Boolean));$('statJobs').textContent=jobs.length;$('statDays').textContent=days.size;$('statPeople').textContent=people.size;$('statVehicles').textContent=vehicles.size;$('dashboard').classList.remove('hidden');$('status').textContent='V2.8 行程已產生：海域水質、海域底泥已分開統計，並以「個案子・個點位」顯示。';applySearch()}catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent='';$('categoryStats').textContent='';$('dashboard').classList.add('hidden')}}
+const byDate=new Map();for(const j of jobs){const k=iso(j.date);if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(j)}let pages='',weeks=0;for(let w=monday(start),last=monday(end);w<=last;w=addDays(w,7)){weeks++;const we=addDays(w,6);let cells='';for(let i=0;i<7;i++){const d=addDays(w,i),dayRaw=(byDate.get(iso(d))||[]).slice().sort((a,b)=>{const ac=clean(a.code),bc=clean(b.code);const cmp=ac.localeCompare(bc,'zh-Hant',{numeric:true,sensitivity:'base'});if(cmp!==0)return cmp;return clean(a.name).localeCompare(clean(b.name),'zh-Hant',{numeric:true,sensitivity:'base'});}),items=group(dayRaw),isToday=iso(d)===iso(today);cells+=`<article class="day ${i>=5?'weekend':''} ${isToday?'today':''}"><header class="day-head">${d.getMonth()+1}/${d.getDate()}（${'一二三四五六日'[i]}）${isToday?'・今天':''}</header><div class="day-body">${items.length?items.map(renderJob).join(''):'<div class="empty">無行程</div>'}</div></article>`}pages+=`<section class="week-page"><div class="week-top"><div><div class="week-title">${esc(tokens.join('＋'))}｜個人工作行程</div><div class="week-range-stats">${esc(rangeStats)}</div></div><div class="week-meta">${w.getFullYear()}/${pad(w.getMonth()+1)}/${pad(w.getDate())} ～ ${we.getFullYear()}/${pad(we.getMonth()+1)}/${pad(we.getDate())}</div></div><div class="week-grid">${cells}</div><div class="footer-note">個人工作行程助手 V2.9｜人員欄包含「${esc(tokens.join('、'))}」任一代號</div></section>`}$('output').innerHTML=pages;$('summary').textContent=`共找到 ${jobs.length} 筆原始行程，整理成 ${weeks} 週。列印時會自動轉為黑白。`;$('categoryStats').textContent=rangeStats;const days=new Set(jobs.map(j=>iso(j.date))),people=new Set(jobs.map(j=>j.person).filter(Boolean)),vehicles=new Set(jobs.map(j=>j.vehicle).filter(Boolean));$('statJobs').textContent=jobs.length;$('statDays').textContent=days.size;$('statPeople').textContent=people.size;$('statVehicles').textContent=vehicles.size;$('dashboard').classList.remove('hidden');$('status').textContent='V2.9 行程已產生：海域水質、海域底泥已分開統計，並以「個案子・個點位」顯示。';applySearch()}catch(err){$('status').textContent=err.message;$('output').innerHTML='';$('summary').textContent='';$('categoryStats').textContent='';$('dashboard').classList.add('hidden')}}
 function applySearch(){const q=$('search').value.trim().toLowerCase();document.querySelectorAll('.job').forEach(el=>el.classList.toggle('is-match',!!q&&el.dataset.search.includes(q)));if(q){const first=document.querySelector('.job.is-match');if(first)first.scrollIntoView({behavior:'smooth',block:'center'})}}
+$('prevWeek').addEventListener('click',()=>{const d=new Date($('start').value+'T00:00:00');setWeek(addDays(d,-7))});
+$('nextWeek').addEventListener('click',()=>{const d=new Date($('start').value+'T00:00:00');setWeek(addDays(d,7))});
+$('thisWeek').addEventListener('click',()=>setWeek(today));
+$('weekSelect').addEventListener('change',()=>{const d=new Date($('weekSelect').value+'T00:00:00');setWeek(d)});
+$('start').addEventListener('change',()=>{$('weekSelect').value=''});
+$('end').addEventListener('change',()=>{$('weekSelect').value=''});
 $('build').addEventListener('click',render);$('search').addEventListener('input',applySearch);$('print').addEventListener('click',()=>window.print());$('colorToggle').addEventListener('click',()=>{document.body.classList.toggle('mono');const mono=document.body.classList.contains('mono');$('colorToggle').textContent=mono?'彩色：關':'彩色：開';$('colorToggle').classList.toggle('toggle-on',!mono);$('modeBadge').textContent=mono?'⚫ 黑白檢視':'🎨 彩色檢視'});
 })();
 </script>
